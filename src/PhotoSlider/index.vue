@@ -1,18 +1,18 @@
 <template>
-  <teleport to="body">
+  <teleport :to="teleportTo">
     <div
       v-if="photoVisible"
       class="PhotoSlider__Wrapper"
       :class="{
-        'PhotoSlider__Clean': showAnimateType !== ShowAnimateEnum.None ,
-        'PhotoSlider__Hide': !overlayVisible,
+        PhotoSlider__Clean: showAnimateType !== ShowAnimateEnum.None,
+        PhotoSlider__Hide: !overlayVisible,
       }"
     >
       <div
         class="PhotoSlider__Backdrop"
         :class="{
-          'PhotoSlider__fadeIn': showAnimateType === ShowAnimateEnum.In,
-          'PhotoSlider__fadeOut': showAnimateType === ShowAnimateEnum.Out
+          PhotoSlider__fadeIn: showAnimateType === ShowAnimateEnum.In,
+          PhotoSlider__fadeOut: showAnimateType === ShowAnimateEnum.Out,
         }"
         :style="{
           background: `rgba(0, 0, 0, ${backdropOpacity})`,
@@ -24,10 +24,7 @@
           {{ index + 1 }} / {{ items.length }}
         </div>
         <div class="PhotoSlider__BannerRight">
-          <download
-            class="PhotoSlider__BannerIcon"
-            @click="handleDownload"
-          />
+          <download class="PhotoSlider__BannerIcon" @click="handleDownload" />
           <rotate-left
             class="PhotoSlider__BannerIcon"
             @click="handleRotateLeft"
@@ -44,10 +41,7 @@
             class="PhotoSlider__BannerIcon"
             @click="toggleFlipVertical"
           />
-          <close
-            class="PhotoSlider__BannerIcon"
-            @click="handleClickClose"
-          />
+          <close class="PhotoSlider__BannerIcon" @click="handleClickClose" />
         </div>
       </div>
       <div
@@ -57,7 +51,9 @@
         :style="{
           left: `${(innerWidth + horizontalOffset) * getItemIndex(item)}px`,
           transition: getTransition(),
-          transform: `translate3d(${-(innerWidth + horizontalOffset) * index + touchMoveX}px, 0px, 0px)`
+          transform: `translate3d(${
+            -(innerWidth + horizontalOffset) * index + touchMoveX
+          }px, 0px, 0px)`,
         }"
         @transitionend="resetNeedTransition"
         @click="handleClickMask"
@@ -90,36 +86,38 @@
           <arrow-right />
         </div>
       </template>
-      <div
-        v-if="currentItem.intro"
-        class="PhotoSlider__FooterWrap"
-      >
+      <div v-if="currentItem.intro" class="PhotoSlider__FooterWrap">
         {{ currentItem.intro }}
       </div>
     </div>
   </teleport>
 </template>
 
-<script lang='ts'>
-import { defineComponent, computed, toRefs, PropType } from 'vue';
-import PhotoView from '../PhotoView/index.vue';
-import { horizontalOffset, minSwitchImageOffset } from '../constant';
-import useBodyEffect from './useBodyEffect';
-import useInnerWidth from './useInnerWidth';
-import Close from './Close.vue';
-import ArrowLeft from './ArrowLeft.vue';
-import ArrowRight from './ArrowRight.vue';
-import RotateLeft from './RotateLeft.vue';
-import RotateRight from './RotateRight.vue';
-import FlipHorizontal from './FlipHorizontal.vue';
-import FilpVertical from './FilpVertical.vue';
-import Download from './Download.vue';
-import useAnimationHandle from './useAnimationHandle';
-import { ItemType, ShowAnimateEnum, TouchTypeEnum, EdgeTypeEnum } from '../types';
-import isTouchDevice from '../utils/isTouchDevice';
+<script lang="ts">
+import { defineComponent, computed, toRefs, PropType } from "vue";
+import PhotoView from "../PhotoView/index.vue";
+import { horizontalOffset, minSwitchImageOffset } from "../constant";
+import useBodyEffect from "./useBodyEffect";
+import useInnerWidth from "./useInnerWidth";
+import Close from "./Close.vue";
+import ArrowLeft from "./ArrowLeft.vue";
+import ArrowRight from "./ArrowRight.vue";
+import RotateLeft from "./RotateLeft.vue";
+import RotateRight from "./RotateRight.vue";
+import FlipHorizontal from "./FlipHorizontal.vue";
+import FilpVertical from "./FilpVertical.vue";
+import Download from "./Download.vue";
+import useAnimationHandle from "./useAnimationHandle";
+import {
+  ItemType,
+  ShowAnimateEnum,
+  TouchTypeEnum,
+  EdgeTypeEnum,
+} from "../types";
+import isTouchDevice from "../utils/isTouchDevice";
 
 export default defineComponent({
-  name: 'PhotoSlider',
+  name: "PhotoSlider",
   components: {
     PhotoView,
     Close,
@@ -173,19 +171,26 @@ export default defineComponent({
     defaultBackdropOpacity: {
       type: Number,
       default: 1,
-    }
+    },
+    /**
+     * Specifies a place in a DOM (target container) where PhotoSlider will be injected
+     * Could bequery selector or HtmlElement
+     */
+    teleportTo: {
+      type: [String, HTMLElement],
+      default: "body",
+    },
   },
-  emits: ['clickPhoto', 'clickMask', 'changeIndex', 'closeModal'],
+  emits: ["clickPhoto", "clickMask", "changeIndex", "closeModal"],
   setup(props) {
     const { items, index, visible } = toRefs(props);
     const currentItem = computed<ItemType>(() => {
       return items.value[index.value] || {};
     });
 
-    useBodyEffect(visible);
-    const {
-      photoVisible, showAnimateType, originRect, onShowAnimateEnd
-    } = useAnimationHandle(visible, currentItem);
+    useBodyEffect(visible, props.teleportTo);
+    const { photoVisible, showAnimateType, originRect, onShowAnimateEnd } =
+      useAnimationHandle(visible, currentItem);
     const { innerWidth } = useInnerWidth();
 
     return {
@@ -218,10 +223,10 @@ export default defineComponent({
     };
   },
   created() {
-    window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener("keydown", this.handleKeyDown);
   },
   beforeUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener("keydown", this.handleKeyDown);
   },
   beforeUpdate() {
     this.photoViewRefs = [];
@@ -229,12 +234,12 @@ export default defineComponent({
   methods: {
     handleDownload() {
       const item = this.items[this.index];
-      const a = document.createElement('a');
-      const paths = item.src.split('.')[0].split('/');
+      const a = document.createElement("a");
+      const paths = item.src.split(".")[0].split("/");
       const name = paths[paths.length - 1];
       a.download = item.downloadName || name;
       a.href = item.src;
-      a.dispatchEvent(new MouseEvent('click'));
+      a.dispatchEvent(new MouseEvent("click"));
     },
     toggleFlipHorizontal() {
       this.photoViewRefs[this.index].toggleFlipHorizontal();
@@ -254,13 +259,13 @@ export default defineComponent({
     handleKeyDown(e: KeyboardEvent) {
       if (this.visible) {
         switch (e.code) {
-          case 'ArrowLeft':
+          case "ArrowLeft":
             this.handlePrevious();
             break;
-          case 'ArrowRight':
+          case "ArrowRight":
             this.handleNext();
             break;
-          case 'Escape':
+          case "Escape":
             this.handleClickClose();
             break;
         }
@@ -277,7 +282,12 @@ export default defineComponent({
       this.clientX = clientX;
       this.clientY = clientY;
     },
-    handleTouchMove(touchType: TouchTypeEnum, clientX: number, clientY: number, edgeTypes: EdgeTypeEnum[]) {
+    handleTouchMove(
+      touchType: TouchTypeEnum,
+      clientX: number,
+      clientY: number,
+      edgeTypes: EdgeTypeEnum[]
+    ) {
       if (touchType === TouchTypeEnum.Scale) {
         this.handleTouchScaleMove(clientX, edgeTypes);
       }
@@ -314,14 +324,22 @@ export default defineComponent({
     handleTouchVerticalMove(clientX: number, clientY: number) {
       let touchMoveY = Math.abs(clientY - this.clientY);
       const opacity = Math.max(
-        Math.min(this.defaultBackdropOpacity, this.defaultBackdropOpacity - touchMoveY / 100 / 4),
+        Math.min(
+          this.defaultBackdropOpacity,
+          this.defaultBackdropOpacity - touchMoveY / 100 / 4
+        ),
         0
       );
 
       this.hasMove = clientX !== this.clientX || clientY !== this.clientY;
       this.backdropOpacity = opacity;
     },
-    handleTouchEnd(touchType: TouchTypeEnum, clientX: number, clientY: number, edgeTypes: EdgeTypeEnum[]) {
+    handleTouchEnd(
+      touchType: TouchTypeEnum,
+      clientX: number,
+      clientY: number,
+      edgeTypes: EdgeTypeEnum[]
+    ) {
       if (touchType === TouchTypeEnum.Scale) {
         this.handleTouchScaleEnd(clientX, edgeTypes);
       }
@@ -344,11 +362,17 @@ export default defineComponent({
     handleTouchScaleEnd(clientX: number, edgeTypes: EdgeTypeEnum[]) {
       const offsetX = clientX - this.clientX;
       // 下一张
-      if (offsetX < -minSwitchImageOffset && edgeTypes.includes(EdgeTypeEnum.Right)) {
+      if (
+        offsetX < -minSwitchImageOffset &&
+        edgeTypes.includes(EdgeTypeEnum.Right)
+      ) {
         this.handleNext();
       }
       // 上一张
-      if (offsetX > minSwitchImageOffset && edgeTypes.includes(EdgeTypeEnum.Left)) {
+      if (
+        offsetX > minSwitchImageOffset &&
+        edgeTypes.includes(EdgeTypeEnum.Left)
+      ) {
         this.handlePrevious();
       }
     },
@@ -367,7 +391,7 @@ export default defineComponent({
       const offsetY = clientY - this.clientY;
 
       if (Math.abs(offsetY) > window.innerHeight * 0.14) {
-        this.$emit('closeModal');
+        this.$emit("closeModal");
       } else {
         this.resetBackdropOpacity();
       }
@@ -383,25 +407,25 @@ export default defineComponent({
     },
     handlePrevious() {
       if (this.index > 0) {
-        this.$emit('changeIndex', this.index - 1);
+        this.$emit("changeIndex", this.index - 1);
       }
     },
     handleNext() {
       if (this.index < this.items.length - 1) {
-        this.$emit('changeIndex', this.index + 1);
+        this.$emit("changeIndex", this.index + 1);
       }
     },
     handleClickPhoto(e: MouseEvent) {
-      this.$emit('clickPhoto', e);
+      this.$emit("clickPhoto", e);
     },
     handleClickMask(e: MouseEvent) {
-      this.$emit('clickMask', e);
+      this.$emit("clickMask", e);
     },
     handleClickClose() {
-      this.$emit('closeModal');
+      this.$emit("closeModal");
     },
     getTransition() {
-      const transition = 'transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)';
+      const transition = "transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)";
       if (this.needTransition) {
         return transition;
       }
@@ -409,8 +433,8 @@ export default defineComponent({
         return undefined;
       }
       return this.shouldTransition ? transition : undefined;
-    }
-  }
+    },
+  },
 });
 </script>
 
@@ -430,7 +454,7 @@ export default defineComponent({
   .PhotoSlider__ArrowRight,
   .PhotoSlider__FooterWrap {
     opacity: 0;
-    @media (any-hover: hover){
+    @media (any-hover: hover) {
       &:hover {
         opacity: 0;
       }
@@ -489,7 +513,7 @@ export default defineComponent({
     transition: opacity 0.2s ease-out;
     z-index: 20;
 
-    @media (any-hover: hover){
+    @media (any-hover: hover) {
       &:hover {
         opacity: 1;
       }
@@ -515,7 +539,7 @@ export default defineComponent({
         cursor: pointer;
         transition: all 0.2s linear;
 
-        @media (any-hover: hover){
+        @media (any-hover: hover) {
           &:hover {
             opacity: 1;
           }
@@ -561,7 +585,7 @@ export default defineComponent({
     justify-content: center;
     align-items: center;
 
-    @media (any-hover: hover){
+    @media (any-hover: hover) {
       &:hover {
         opacity: 1;
       }
@@ -593,7 +617,7 @@ export default defineComponent({
     transition: opacity 0.2s ease-out;
     z-index: 20;
 
-    @media (any-hover: hover){
+    @media (any-hover: hover) {
       &:hover {
         opacity: 1;
       }
