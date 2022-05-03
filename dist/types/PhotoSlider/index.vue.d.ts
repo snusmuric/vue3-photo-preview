@@ -102,7 +102,7 @@ declare const _default: import("vue").DefineComponent<{
     handleClickMask(e: MouseEvent): void;
     handleClickClose(): void;
     getTransition(): "transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)" | undefined;
-}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("clickPhoto" | "clickMask" | "changeIndex" | "closeModal")[], "clickPhoto" | "clickMask" | "changeIndex" | "closeModal", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<{
+}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("clickPhoto" | "clickMask" | "changeIndex" | "closeModal" | "singleTap")[], "clickPhoto" | "clickMask" | "changeIndex" | "closeModal" | "singleTap", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<{
     items?: unknown;
     index?: unknown;
     visible?: unknown;
@@ -123,6 +123,7 @@ declare const _default: import("vue").DefineComponent<{
     onClickMask?: ((...args: any[]) => any) | undefined;
     onChangeIndex?: ((...args: any[]) => any) | undefined;
     onCloseModal?: ((...args: any[]) => any) | undefined;
+    onSingleTap?: ((...args: any[]) => any) | undefined;
 }, {
     shouldTransition: boolean;
     toggleOverlay: boolean;

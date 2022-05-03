@@ -181,7 +181,7 @@ export default defineComponent({
       default: "body",
     },
   },
-  emits: ["clickPhoto", "clickMask", "changeIndex", "closeModal"],
+  emits: ["clickPhoto", "clickMask", "changeIndex", "closeModal", "singleTap"],
   setup(props) {
     const { items, index, visible } = toRefs(props);
     const currentItem = computed<ItemType>(() => {
@@ -275,6 +275,7 @@ export default defineComponent({
       if (this.toggleOverlay) {
         this.overlayVisible = !this.overlayVisible;
       }
+      this.$emit("singleTap");
     },
     handleTouchStart(clientX: number, clientY: number) {
       this.touched = true;

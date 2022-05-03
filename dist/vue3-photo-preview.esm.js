@@ -1650,7 +1650,7 @@ var script$2 = defineComponent({
             default: "body",
         },
     },
-    emits: ["clickPhoto", "clickMask", "changeIndex", "closeModal"],
+    emits: ["clickPhoto", "clickMask", "changeIndex", "closeModal", "singleTap"],
     setup: function (props) {
         var _a = toRefs(props), items = _a.items, index = _a.index, visible = _a.visible;
         var currentItem = computed(function () {
@@ -1741,6 +1741,7 @@ var script$2 = defineComponent({
             if (this.toggleOverlay) {
                 this.overlayVisible = !this.overlayVisible;
             }
+            this.$emit("singleTap");
         },
         handleTouchStart: function (clientX, clientY) {
             this.touched = true;
